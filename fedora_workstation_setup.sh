@@ -3,8 +3,7 @@
 # Script: fedora_workstation_setup.sh
 # Author: Mohammed Ismaili Alaoui
 # Description: Automated provisioning script for a complete Fedora Workstation.
-#              Sets up a C++ Data Engineering environment, installs industry
-#              standard Cybersecurity tools, and configures daily-driver apps.
+#              Updated for DNF5 and features unattended installer handling.
 # ==============================================================================
 
 echo "Starting Fedora Workstation Provisioning by Mohammed Ismaili Alaoui..."
@@ -12,22 +11,18 @@ echo "Starting Fedora Workstation Provisioning by Mohammed Ismaili Alaoui..."
 # --- 1. System Update & Core Utilities ---
 echo "--> Updating dnf packages..."
 sudo dnf update -y
-
 echo "--> Installing core utilities (curl, wget, htop, flatpak)..."
 sudo dnf install -y curl wget htop flatpak
 
 # --- 2. C/C++ Development Environment ---
-echo "--> Installing C++ toolchain (GCC, CMake, GDB, Make)..."
-sudo dnf install -y gcc gcc-c++ gdb cmake make
-
-echo "--> Installing diagnostic tools and version control (valgrind, git)..."
-sudo dnf install -y valgrind git
+echo "--> Installing C++ toolchain and tools (GCC, CMake, GDB, Make, Valgrind, Git)..."
+sudo dnf install -y gcc gcc-c++ gdb cmake make valgrind git
 
 # --- 3. Cybersecurity & Penetration Testing Tools ---
 echo "--> Installing Network Security Tools (Nmap, Wireshark, Aircrack-ng)..."
 sudo dnf install -y nmap wireshark wireshark-qt aircrack-ng
 
-# Add user to wireshark group for non-root packet capture (Best Practice)
+# Add user to wireshark group for non-root packet capture
 sudo usermod -a -G wireshark $USER
 
 echo "--> Installing Metasploit Framework..."
@@ -36,14 +31,17 @@ chmod 755 msfinstall
 sudo ./msfinstall
 rm msfinstall
 
-echo "--> Setting up Flathub and Installing Burp Suite Community..."
-sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-sudo flatpak install -y flathub net.portswigger.BurpSuiteCommunity
+echo "--> Downloading and Installing Burp Suite Community (Unattended)..."
+# Downloads the latest Linux installer, makes it executable, runs silently, and cleans up
+curl -fsSL "https://portswigger.net/burp/releases/download?product=community&version=&type=Linux" -o burpsuite_installer.sh
+chmod +x burpsuite_installer.sh
+sudo ./burpsuite_installer.sh -q
+rm burpsuite_installer.sh
 
 # --- 4. Professional Consulting Tools (Docker & VS Code) ---
 echo "--> Installing Docker..."
 sudo dnf install -y dnf-plugins-core
-sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+sudo dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
 sudo dnf install -y docker-ce docker-ce-cli containerd.io
 sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
@@ -57,8 +55,8 @@ sudo dnf install -y code
 echo "--> Enabling Fedora Workstation third-party repositories..."
 sudo dnf install -y fedora-workstation-repositories
 
-echo "--> Installing Google Chrome Stable..."
-sudo dnf config-manager --set-enabled google-chrome
+echo "--> Enabling and Installing Google Chrome Stable..."
+sudo dnf config-manager setopt google-chrome.enabled=1
 sudo dnf install -y google-chrome-stable
 
 # --- 6. Finalization ---
