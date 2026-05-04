@@ -35,3 +35,13 @@ By running a single script, the system is securely updated and configured with i
 3. Make the script executable:
    ```bash
    chmod +x fedora_workstation_setup.sh
+## System Requirements & Storage Footprint
+
+Running this provisioning script requires approximately **4 GB to 5 GB of free disk space** on your Fedora machine. 
+
+This storage is allocated to industry-standard tools, heavy exploit databases, and isolated application runtimes. Here is the approximate breakdown of the space utilization:
+
+* **C++ Toolchain & Core System Utilities:** ~500 MB
+* **Professional Consulting Tools (Docker CE, VS Code, Google Chrome):** ~1 GB
+* **Metasploit Framework:** ~1.2 GB *(Includes extensive Rapid7 exploit databases)*
+* **Burp Suite Community (via Flatpak):** ~1.5 GB to 2 GB *(Includes isolated Flathub runtime environments for secure execution)*   
